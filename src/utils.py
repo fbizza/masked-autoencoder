@@ -1,6 +1,14 @@
 import numpy as np
 import torch
+import random
 from einops import repeat
+
+def set_seed(seed=29):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
 
 def random_permutation_with_inverse(length: int):
     # to generate indices and invert them
