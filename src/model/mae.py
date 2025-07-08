@@ -2,8 +2,8 @@ import torch
 from einops import rearrange
 
 from src.utils import set_seed
-from mae_encoder import Encoder, MaskPatches
-from mae_decoder import Decoder
+from src.model.mae_encoder import Encoder, MaskPatches
+from src.model.mae_decoder import Decoder
 
 class MaskedAutoencoder(torch.nn.Module):
     def __init__(self,
