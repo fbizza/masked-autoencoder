@@ -13,7 +13,7 @@ from utils import set_seed, load_config
 def get_cifar10_dataloaders(train_subset=None, load_batch_size=64):
     transform = Compose([ToTensor(), Normalize(0.5, 0.5)])
     train_full = torchvision.datasets.CIFAR10('data', train=True, download=True, transform=transform)
-    val = torchvision.datasets.CIFAR10('data', train=False, download=True, transform=transform)
+    test = torchvision.datasets.CIFAR10('data', train=False, download=True, transform=transform)
 
     if train_subset:
         indices = torch.randperm(len(train_full))[:train_subset]
@@ -24,22 +24,22 @@ def get_cifar10_dataloaders(train_subset=None, load_batch_size=64):
     train_loader = torch.utils.data.DataLoader(
         train, batch_size=load_batch_size, shuffle=True
     )
-    val_loader = torch.utils.data.DataLoader(
-        val, batch_size=load_batch_size, shuffle=False
+    test_loader = torch.utils.data.DataLoader(
+        test, batch_size=load_batch_size, shuffle=False
     )
-    return train_loader, val_loader, val
+    return train_loader, test_loader, test
 
 
 
 if __name__ == '__main__':
-    config = load_config(config_name="default")
+    config = load_config(config_name="mae-self-supervised-training")
     set_seed(config.seed)
     batch_size = config.batch_size
     gpu_load_batch_size = min(config.max_device_batch_size, batch_size)
     assert batch_size % gpu_load_batch_size == 0, \
         f"batch_size ({batch_size}) must be divisible by gpu_load_batch_size ({gpu_load_batch_size})"
     steps_per_update = batch_size // gpu_load_batch_size
-    dataloader, val_loader, val_dataset = get_cifar10_dataloaders(config.train_subset, gpu_load_batch_size)
+    dataloader, test_loader, test_dataset = get_cifar10_dataloaders(config.train_subset, gpu_load_batch_size)
     writer = SummaryWriter(os.path.join('data/logs', 'cifar10', f'{config.config_name}'))
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Using device: {device}")
@@ -78,24 +78,24 @@ if __name__ == '__main__':
         avg_train_loss = sum(train_losses) / len(train_losses)
         print(f'Train loss on masked pixels: {avg_train_loss:.6f}')
 
-        # To visualize improvement on images reconstruction quality for each epoch
+        # to visualize improvement on images reconstruction quality for each epoch
         model.eval()
         with torch.no_grad():
-            test_img = torch.stack([val_dataset[i][0] for i in range(16)])
+            test_img = torch.stack([test_dataset[i][0] for i in range(16)])
             test_img = test_img.to(device)
-            predicted_val_img, mask = model(test_img)
-            predicted_val_img = predicted_val_img * mask + test_img * (1 - mask)
-            img = torch.cat([test_img * (1 - mask), predicted_val_img, test_img], dim=0)
+            predicted_test_img, mask = model(test_img)
+            predicted_test_img = predicted_test_img * mask + test_img * (1 - mask)
+            img = torch.cat([test_img * (1 - mask), predicted_test_img, test_img], dim=0)
             img = rearrange(img, '(v h1 w1) c h w -> c (h1 h) (w1 v w)', w1=2, v=3)
             writer.add_image('mae_image', (img + 1) / 2, global_step=e)
 
-        # validation loss
+        # test loss
         test_losses = []
         with torch.no_grad():
-            for test_img, _ in val_loader:
+            for test_img, _ in test_loader:
                 test_img = test_img.to(device)
-                predicted_val_img, mask = model(test_img)
-                loss = torch.mean((predicted_val_img - test_img) ** 2 * mask) / config.mask_ratio
+                predicted_test_img, mask = model(test_img)
+                loss = torch.mean((predicted_test_img - test_img) ** 2 * mask) / config.mask_ratio
                 test_losses.append(loss.item())
         avg_test_loss = sum(test_losses) / len(test_losses)
 
@@ -110,7 +110,7 @@ if __name__ == '__main__':
             os.makedirs(config.model_path, exist_ok=True)
             torch.save(model, f"{config.model_path}/{config.config_name}_epoch_{e}.pt")
 
-        # save check point every 25 epochs
+        # save checkpoint every 25 epochs
         if e % 25 == 0:
             checkpoint = {
                 'epoch': e,
