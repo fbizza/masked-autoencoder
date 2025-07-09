@@ -1,9 +1,10 @@
-seed: 29
-batch_size: 4096
-max_device_batch_size: 128
-base_learning_rate: 0.00015
-weight_decay: 0.05
-mask_ratio: 0.75
-epochs: 2000
-warmup_epochs: 200
-model_path: vit-t-mae.pt
+default:
+  seed: 29
+  batch_size: 2048
+  max_device_batch_size: 128
+  base_learning_rate: 1.5e-4
+  weight_decay: 0.05
+  mask_ratio: 0.75
+  total_epoch: 200
+  warmup_epoch: 10
+  train_subset: 50000
