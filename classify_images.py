@@ -57,12 +57,12 @@ def show_predictions(images, labels, preds, class_names):
 
 
 if __name__ == "__main__":
-    # you can change the following 2 parameters:
+    # you can change the following 3 parameters:
     start_index = 4000
     num_images = 8
+    model_path = "src/data/weights/classifier-with-pretrained-encoder.pt"
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model_path = "src/data/weights/classifier-with-pretrained-encoder.pt"
 
     model = load_model(model_path, device=device)
     val_dataset = get_val_dataset()
