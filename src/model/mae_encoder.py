@@ -47,9 +47,9 @@ class Encoder(torch.nn.Module):
 
         self.cls_token = torch.nn.Parameter(torch.zeros(1, 1, emb_dim))
 
-        self.pos_embedding = torch.nn.Parameter(torch.zeros(num_patches, 1, emb_dim))
+        self.pos_embedding = torch.nn.Parameter(torch.zeros(num_patches, 1, emb_dim))  # NOTE: learnable positional embedding as in the orignal ViT
 
-        self.patchify = torch.nn.Conv2d(3, emb_dim, patch_size, patch_size)
+        self.patchify = torch.nn.Conv2d(3, emb_dim, patch_size, patch_size)  # (Convolution used for simplicity, it would be the same as usign extraction + flatten + linear)
 
         self.shuffle = MaskPatches(mask_ratio)
 
@@ -64,6 +64,7 @@ class Encoder(torch.nn.Module):
     def init_weight(self):
         trunc_normal_(self.cls_token, std=.02)
         trunc_normal_(self.pos_embedding, std=.02)
+        # init of transformer blocks is handled by the library following the original ViT
 
     def forward(self, img):
         patches = self.patchify(img)  # e.g. [2, 3, 32, 32] -> [2, 192, 16, 16]
