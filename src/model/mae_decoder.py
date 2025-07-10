@@ -1,8 +1,6 @@
 import torch
-
 from einops import rearrange
 from einops.layers.torch import Rearrange
-
 from timm.layers import trunc_normal_
 from timm.models.vision_transformer import Block
 

@@ -1,7 +1,5 @@
 import torch
-
 from einops import rearrange
-
 from timm.layers import trunc_normal_
 from timm.models.vision_transformer import Block
 
@@ -62,9 +60,9 @@ class Encoder(torch.nn.Module):
         self.init_weight()
 
     def init_weight(self):
+        # (init of transformer blocks is handled by the library following the original ViT)
         trunc_normal_(self.cls_token, std=.02)
         trunc_normal_(self.pos_embedding, std=.02)
-        # init of transformer blocks is handled by the library following the original ViT
 
     def forward(self, img):
         patches = self.patchify(img)  # e.g. [2, 3, 32, 32] -> [2, 192, 16, 16]

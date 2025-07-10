@@ -35,7 +35,7 @@ def get_cifar10_dataloaders(train_subset=None, load_batch_size=64):
 
 
 if __name__ == '__main__':
-    config = load_config(config_name="classifier-with-pretrained-encoder")
+    config = load_config(config_name="classifier-without-pretrained-encoder")
     set_seed(config.seed)
 
     batch_size = config.batch_size
@@ -59,16 +59,12 @@ if __name__ == '__main__':
         writer = SummaryWriter(os.path.join('data/logs', 'cifar10', 'not-pretrained-classifier'))
 
     model = MaskedAutoencoderClassifier(model.encoder, num_classes=10).to(device)
-    # trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-    # frozen_params = sum(p.numel() for p in model.parameters() if not p.requires_grad)
-    #
-    # print(f"Parametri allenabili: {trainable_params:,}")
-    # print(f"Parametri non allenabili (frozen): {frozen_params:,}")
 
     accuracy_function = lambda logit, label: torch.mean((logit.argmax(dim=-1) == label).float())
 
     loss_function = torch.nn.CrossEntropyLoss()
 
+    # as described in the paper
     optim = torch.optim.AdamW(
         model.parameters(),
         lr=config.base_learning_rate * config.batch_size / 256,
@@ -83,7 +79,7 @@ if __name__ == '__main__':
     lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optim, lr_lambda=lr_func)
 
     best_test_accuracy = 0
-    step_count = 0
+    step_count = 0  # for gradient accumulation
     optim.zero_grad()
 
     for e in range(config.total_epoch):

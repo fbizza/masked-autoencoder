@@ -19,3 +19,13 @@ classifier-with-pretrained-encoder:
   warmup_epoch: 5
   train_subset: 10000
   pretrained_model_path: data/weights/mae-self-supervised-training_epoch_160.pt
+
+classifier-without-pretrained-encoder:
+  seed: 29
+  batch_size: 128
+  max_device_batch_size: 128
+  base_learning_rate: 1.0e-3
+  weight_decay: 0.05
+  total_epoch: 100
+  warmup_epoch: 5
+  train_subset: 10000

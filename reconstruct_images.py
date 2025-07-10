@@ -70,7 +70,7 @@ if __name__ == "__main__":
     num_images = 6
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    model_path = "src/data/weights/pretrained-mae.pt"
+    model_path = "src/data/weights/mae-self-supervised-training_epoch_160.pt"
 
     model = torch.load(model_path, map_location=device, weights_only=False)
     model.to(device)

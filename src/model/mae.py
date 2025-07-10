@@ -1,7 +1,6 @@
 import torch
 from einops import rearrange
 
-from src.utils import set_seed
 from src.model.mae_encoder import Encoder, MaskPatches
 from src.model.mae_decoder import Decoder
 
@@ -47,20 +46,3 @@ class MaskedAutoencoderClassifier(torch.nn.Module):
         logits = self.head(features[0])
         return logits
 
-
-if __name__ == '__main__':
-    set_seed()
-    shuffle = MaskPatches(0.75)
-    a = torch.rand(16, 2, 10)
-    b, forward_indexes, backward_indexes = shuffle(a)
-    print(b.shape)  # it should print num_patches_after_masking, batch_size (2), num_channels (10)
-
-    img = torch.rand(2, 3, 32, 32)
-    encoder = Encoder()
-    decoder = Decoder()
-    features, backward_indexes = encoder(img)
-    print(forward_indexes.shape)
-    predicted_img, mask = decoder(features, backward_indexes)
-    print(predicted_img.shape)
-    loss = torch.mean((predicted_img - img) ** 2 * mask / 0.75)  # NOTE: in the original paper no loss is computed on visible patches!
-    print(loss)

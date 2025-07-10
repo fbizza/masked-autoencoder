@@ -36,6 +36,6 @@ def random_permutation_with_inverse(length: int):
     return permutation, inverse_permutation
 
 def take_indices(sequences: torch.Tensor, indices: torch.Tensor) -> torch.Tensor:
-    # takes patches based on indices across batches
+    # to take patches based on indices across batches
     return torch.gather(sequences, 0, repeat(indices, 'p b -> p b c', c=sequences.shape[-1]))
 
