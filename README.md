@@ -29,5 +29,10 @@ This script pretrains the full MAE model following the pre-training setting desc
 This script fine-tunes a classifier on top of the pretrained encoder (End-to-End fine-tuning, as described in the original paper).
 
 ## Training Configurations
-The ``` config.yaml ``` file can be edited to run the training with different configurations
+The ``` config.yaml ``` file can be edited to run the training with different configurations. 
 
+In the provided scripts:
+- The default model used to reconstruct images is the one trained with 75% masking. 
+- The default model used to classify images is the one obtained fine-tuning the pretrained encoder with 75% masking. 
+
+It is possible to change the model path in the scripts (e.g. from ``` mae-75-masking ``` to ``` mae-25-masking ```) according to the weights released in the ``` src/data/weights ``` folder.

@@ -32,7 +32,7 @@ def get_cifar10_dataloaders(train_subset=None, load_batch_size=64):
 
 
 if __name__ == '__main__':
-    config = load_config(config_name="mae-self-supervised-training-25-masking")  #TODO: change this
+    config = load_config(config_name="mae-self-supervised-training")
     set_seed(config.seed)
     batch_size = config.batch_size
     gpu_load_batch_size = min(config.max_device_batch_size, batch_size)
