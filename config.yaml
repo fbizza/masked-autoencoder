@@ -29,3 +29,14 @@ classifier-without-pretrained-encoder:
   total_epoch: 100
   warmup_epoch: 5
   train_subset: 10000
+
+mae-self-supervised-training-25-masking:
+  seed: 29
+  batch_size: 128
+  max_device_batch_size: 128
+  base_learning_rate: 1.5e-4
+  weight_decay: 0.05
+  mask_ratio: 0.25
+  total_epoch: 160
+  warmup_epoch: 5
+  train_subset: 25000
